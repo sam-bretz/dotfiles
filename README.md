@@ -3,4 +3,3 @@
 sketchybar
 borders
 neovim
-# dotfiles
