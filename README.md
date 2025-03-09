@@ -9,4 +9,5 @@ tmux
 aerospace
 neovim
 zshrc
-vim plugins/configs
+svim
+stow
