@@ -1,8 +1,6 @@
 # Tools
-
 sketchybar
 borders
-
 
 # TODO
 tmux
@@ -11,3 +9,6 @@ neovim
 zshrc
 svim
 stow
+telescope 
+fzf
+harpoon
