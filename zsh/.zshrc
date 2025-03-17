@@ -82,13 +82,15 @@ source $ZSH/oh-my-zsh.sh
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
 # For a full list of active aliases, run `alias`.
 
-alias zshconfig="vim ~/.zshrc"
 alias gs="git status"
 alias k="kubectl"
 alias c="clear"
 alias in="task add project:inbox"
 alias vim="nvim"
 alias v="nvim"
+alias zconf="vim ~/.zshrc"
+alias dotdir='cd ~/.dotfiles/'
+alias nvimdir='cd ~/.dotfiles/nvim/.config/nvim'
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
