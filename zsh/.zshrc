@@ -1,3 +1,6 @@
+# Start at home dir (tmux and other complains when initianting from non ~ dirs)
+cd ~
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -56,7 +59,9 @@ HIST_STAMPS="mm/dd/yyyy"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
+
+
 
 source $ZSH/oh-my-zsh.sh
 
@@ -91,6 +96,7 @@ alias v="nvim"
 alias zconf="vim ~/.zshrc"
 alias dotdir='cd ~/.dotfiles/'
 alias nvimdir='cd ~/.dotfiles/nvim/.config/nvim'
+alias luaplugindir='cd /Users/samuelbretz/.dotfiles/nvim/.config/nvim/lua/plugins'
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh

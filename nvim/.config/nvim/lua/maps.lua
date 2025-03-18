@@ -33,3 +33,8 @@ keymap.set('n', '<C-w><left>', '<C-w><')
 keymap.set('n', '<C-w><right>', '<C-w>>')
 keymap.set('n', '<C-w><up>', '<C-w>+')
 keymap.set('n', '<C-w><down>', '<C-w>-')
+
+-- Nerdtree
+keymap.set('n', '<F6>', ':NERDTreeToggle<CR>')
+keymap.set('n', '<C-n>', ':NERDTreeToggle<CR>')
+
