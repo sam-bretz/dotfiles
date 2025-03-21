@@ -1,6 +1,4 @@
-require('base_vim_config')
-require('highlights')
-require('maps')
-require('macos')
-require('config.lazy')
+require('sambretz.core')
+require('sambretz.lazy')
+require('sambretz.plugins')
 

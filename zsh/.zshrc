@@ -1,4 +1,4 @@
-# Start at home dir (tmux and other complains when initianting from non ~ dirs)
+#Start at home dir (tmux and other complains when initianting from non ~ dirs)
 cd ~
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
@@ -11,7 +11,7 @@ fi
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 # Path to your oh-my-zsh installation.
-export ZSH="/Users/samuelbretz/.oh-my-zsh"
+export ZSH=".oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -87,16 +87,20 @@ source $ZSH/oh-my-zsh.sh
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
 # For a full list of active aliases, run `alias`.
 
+# 
 alias gs="git status"
 alias k="kubectl"
 alias c="clear"
 alias in="task add project:inbox"
 alias vim="nvim"
-alias v="nvim"
+alias v="nvim ."
+
+# Configs
 alias zconf="vim ~/.zshrc"
+alias tconf="vim ~/.tmux.conf"
 alias dotdir='cd ~/.dotfiles/'
-alias nvimdir='cd ~/.dotfiles/nvim/.config/nvim'
-alias luaplugindir='cd /Users/samuelbretz/.dotfiles/nvim/.config/nvim/lua/plugins'
+alias nvdir='cd ~/.dotfiles/nvim/.config/nvim'
+alias luadir='~/.dotfiles/nvim/.config/nvim/lua/sambretz'
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
