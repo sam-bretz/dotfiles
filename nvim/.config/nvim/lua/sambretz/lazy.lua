@@ -23,3 +23,4 @@ vim.g.mapleader = ' '
 
 -- Setup lazy.nvim
 require("lazy").setup("sambretz.plugins")
+
