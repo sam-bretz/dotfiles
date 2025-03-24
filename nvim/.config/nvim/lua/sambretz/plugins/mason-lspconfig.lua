@@ -31,7 +31,7 @@ return {
         "cssls",
         "tailwindcss",
         "lua_ls",
-        "yaml",
+        "yamlls",
         "graphql",
         "emmet_ls",
         "prismals",
