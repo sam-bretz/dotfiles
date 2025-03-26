@@ -94,13 +94,19 @@ alias c="clear"
 alias in="task add project:inbox"
 alias vim="nvim"
 alias v="nvim ."
+alias zs="source ~/.zshrc"
 
 # Configs
 alias zconf="vim ~/.zshrc"
 alias tconf="vim ~/.tmux.conf"
-alias dotdir='cd ~/.dotfiles/'
-alias nvdir='cd ~/.dotfiles/nvim/.config/nvim'
-alias luadir='~/.dotfiles/nvim/.config/nvim/lua/sambretz'
+
+# Dirs and projects
+alias fairweather="cd ~/programming/fair-weather && v"
+alias nvd='cd ~/.dotfiles/nvim/.config/nvim'
+alias luad='~/.dotfiles/nvim/.config/nvim/lua/sambretz'
+alias dot='cd ~/.dotfiles/ && v'
+
+
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
