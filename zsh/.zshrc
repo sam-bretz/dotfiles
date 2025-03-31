@@ -105,7 +105,9 @@ alias fairweather="cd ~/programming/fair-weather && v"
 alias nvd='cd ~/.dotfiles/nvim/.config/nvim'
 alias luad='~/.dotfiles/nvim/.config/nvim/lua/sambretz'
 alias dot='cd ~/.dotfiles/ && v'
+alias dotdir='cd ~/.dotfiles/'
 alias nvp='cd ~/.dotfiles/nvim/.config/nvim/lua/sambretz/plugins/ && v' # nvim plugin dir
+
 
 
 
