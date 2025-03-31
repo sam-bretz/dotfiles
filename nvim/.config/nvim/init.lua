@@ -1,4 +1,2 @@
-require('sambretz.core')
-require('sambretz.lazy')
-require('sambretz.plugins')
-
+-- bootstrap lazy.nvim, LazyVim and your plugins
+require("config.lazy")
