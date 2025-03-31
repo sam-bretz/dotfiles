@@ -38,5 +38,9 @@ keymap("n", "<Right>", ":vertical resize -1<CR>", default_opts)
 keymap("n", "<Up>", ":resize -1<CR>", default_opts)
 keymap("n", "<Down>", ":resize +1<CR>", default_opts)
 
+-- Remap Lazy
 keymap("c", "lz", ":Lazy<CR>", default_opts)
 
+-- Quit
+keymap("n", "<leader>q", ":q<CR>", default_opts)
+keymap("n", "<C-q>", ":qa<CR>", default_opts)
