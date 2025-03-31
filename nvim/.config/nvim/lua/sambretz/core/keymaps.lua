@@ -1,38 +1,39 @@
-local keymap = vim.keymap
+local keymap = vim.api.nvim_set_keymap
+local default_opts = { noremap = true, silent = true }
+local expr_opts = { noremap = true, expr = true, silent = true }
 
--- Do not yank with x
-keymap.set('n', 'x', '"_x')
+-- Better escape using jk in insert and terminal mode
+keymap("i", "jk", "<ESC>", default_opts)
+keymap("t", "jk", "<C-\\><C-n>", default_opts)
 
--- increment/decrement
-keymap.set('n', '+', '<C-a>')
-keymap.set('n', '-', '<C-x>')
+-- Center search results
+keymap("n", "n", "nzz", default_opts)
+keymap("n", "N", "Nzz", default_opts)
 
--- New tab
-keymap.set('n', 'te', ':tabedit<Return>', { silent = true })
+-- Visual line wraps
+keymap("n", "k", "v:count == 0 ? 'gk' : 'k'", expr_opts)
+keymap("n", "j", "v:count == 0 ? 'gj' : 'j'", expr_opts)
 
--- Split window 
-keymap.set('n', 'ss', ':split<Return><C-w>w', { silent = true })
-keymap.set('n', 'sv', ':vsplit<Return><C-w>w', { silent = true })
+-- Better indent
+keymap("v", "<", "<gv", default_opts)
+keymap("v", ">", ">gv", default_opts)
 
--- Move window
-keymap.set('n', '<Space>', '<C-w>w')
-keymap.set('n', 's<left>', '<C-w>h')
-keymap.set('', 's<up>', '<C-w>k')
-keymap.set('', 's<down>', '<C-w>j')
-keymap.set('', 's<right>', '<C-w>l')
-keymap.set('', 'sh', '<C-w>h')
-keymap.set('', 'sk', '<C-w>k')
-keymap.set('', 'sj', '<C-w>j')
-keymap.set('', 'sl', '<C-w>l')
+-- Paste over currently selected text without yanking it
+keymap("v", "p", '"_dP', default_opts)
 
--- Resize window
-keymap.set('n', '<C-w><left>', '<C-w><')
-keymap.set('n', '<C-w><right>', '<C-w>>')
-keymap.set('n', '<C-w><up>', '<C-w>+')
-keymap.set('n', '<C-w><down>', '<C-w>-')
+-- Switch buffer
+keymap("n", "<S-h>", ":bprevious<CR>", default_opts)
+keymap("n", "<S-l>", ":bnext<CR>", default_opts)
 
+-- Cancel search highlighting with ESC
+keymap("n", "<ESC>", ":nohlsearch<Bar>:echo<CR>", default_opts)
 
--- Quit remap
-keymap.set('n', '<Leader>qq', ':q!<CR>')
+-- Move selected line / block of text in visual mode
+keymap("x", "K", ":move '<-2<CR>gv-gv", default_opts)
+keymap("x", "J", ":move '>+1<CR>gv-gv", default_opts)
 
-
+-- Resizing panes
+keymap("n", "<Left>", ":vertical resize +1<CR>", default_opts)
+keymap("n", "<Right>", ":vertical resize -1<CR>", default_opts)
+keymap("n", "<Up>", ":resize -1<CR>", default_opts)
+keymap("n", "<Down>", ":resize +1<CR>", default_opts)
