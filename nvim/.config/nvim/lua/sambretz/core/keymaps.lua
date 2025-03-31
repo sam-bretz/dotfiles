@@ -1,46 +1,32 @@
-local keymap = vim.api.nvim_set_keymap
+-- Define default options
 local default_opts = { noremap = true, silent = true }
-local expr_opts = { noremap = true, expr = true, silent = true }
-
--- Better escape using jk in insert and terminal mode
-keymap("i", "jk", "<ESC>", default_opts)
-keymap("t", "jk", "<C-\\><C-n>", default_opts)
 
 -- Center search results
-keymap("n", "n", "nzz", default_opts)
-keymap("n", "N", "Nzz", default_opts)
+vim.keymap.set("n", "n", "nzz", default_opts)
+vim.keymap.set("n", "N", "Nzz", default_opts)
 
--- Visual line wraps
-keymap("n", "k", "v:count == 0 ? 'gk' : 'k'", expr_opts)
-keymap("n", "j", "v:count == 0 ? 'gj' : 'j'", expr_opts)
+-- Better indenting
+vim.keymap.set("v", "<", "<gv", default_opts)
+vim.keymap.set("v", ">", ">gv", default_opts)
 
--- Better indent
-keymap("v", "<", "<gv", default_opts)
-keymap("v", ">", ">gv", default_opts)
-
--- Paste over currently selected text without yanking it
-keymap("v", "p", '"_dP', default_opts)
-
--- Switch buffer
-keymap("n", "<S-h>", ":bprevious<CR>", default_opts)
-keymap("n", "<S-l>", ":bnext<CR>", default_opts)
+-- Switch buffers
+vim.keymap.set("n", "<S-h>", ":bprevious<CR>", default_opts)
+vim.keymap.set("n", "<S-l>", ":bnext<CR>", default_opts)
 
 -- Cancel search highlighting with ESC
-keymap("n", "<ESC>", ":nohlsearch<Bar>:echo<CR>", default_opts)
+vim.keymap.set("n", "<ESC>", ":nohlsearch<Bar>:echo<CR>", default_opts)
 
--- Move selected line / block of text in visual mode
-keymap("x", "K", ":move '<-2<CR>gv-gv", default_opts)
-keymap("x", "J", ":move '>+1<CR>gv-gv", default_opts)
+-- Move selected line/block of text in visual mode
+vim.keymap.set("x", "K", ":move '<-2<CR>gv-gv", default_opts)
+vim.keymap.set("x", "J", ":move '>+1<CR>gv-gv", default_opts)
 
--- Resizing panes
-keymap("n", "<Left>", ":vertical resize +1<CR>", default_opts)
-keymap("n", "<Right>", ":vertical resize -1<CR>", default_opts)
-keymap("n", "<Up>", ":resize -1<CR>", default_opts)
-keymap("n", "<Down>", ":resize +1<CR>", default_opts)
-
--- Remap Lazy
-keymap("c", "lz", ":Lazy<CR>", default_opts)
+-- Resize panes
+vim.keymap.set("n", "<Left>", ":vertical resize +1<CR>", default_opts)
+vim.keymap.set("n", "<Right>", ":vertical resize -1<CR>", default_opts)
+vim.keymap.set("n", "<Up>", ":resize -1<CR>", default_opts)
+vim.keymap.set("n", "<Down>", ":resize +1<CR>", default_opts)
 
 -- Quit
-keymap("n", "<leader>q", ":q<CR>", default_opts)
-keymap("n", "<C-q>", ":qa<CR>", default_opts)
+vim.keymap.set("n", "<C-o>", ":q<CR>", default_opts)
+vim.keymap.set("n", "<C-w>", ":qa<CR>", default_opts)
+
