@@ -6,3 +6,10 @@
 --
 -- Or remove existing autocmds by their group name (which is prefixed with `lazyvim_` for the defaults)
 -- e.g. vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
+
+vim.api.nvim_create_autocmd("TermOpen", {
+  pattern == "term://*lazygit",
+  callback == function()
+    vim.api.nvim_buf_set_keymap(0, "t", "<C-a>", "<C-a>", { noremap = true, silent = true })
+  end,
+})
