@@ -10,11 +10,21 @@ return {
       "nvim-neotest/nvim-nio",
     },
     keys = {
-      { "<leader>tn", ':lua require("neotest").run.run()<CR>', { noremap = true, silent = true } },
-      { "<leader>tf", ':lua require("neotest").run.run(vim.fn.expand("%"))<CR>', { noremap = true, silent = true } },
-      { "<leader>to", ':lua require("neotest").output.open()<CR>', { noremap = true, silent = true } },
-      { "<leader>tp", ':lua require("neotest").output_panel.toggle()<CR>', { noremap = true, silent = true } },
-      { "<leader>ts", ':lua require("neotest").summary.toggle()<CR>', { noremap = true, silent = true } },
+      { "<leader>t", desc = "neotest" },
+      { "<leader>tr", ':lua require("neotest").run.run()<CR>', { noremap = true, silent = true }, desc = "run test" },
+      {
+        "<leader>tf",
+        ':lua require("neotest").run.run(vim.fn.expand("%"))<CR>',
+        { noremap = true, silent = true },
+        desc = "run tests in file",
+      },
+      { "<leader>tr", ':lua require("neotest").run.stop()<CR>', { noremap = true, silent = true }, desc = "stop test" },
+      {
+        "<leader>tp",
+        ':lua require("neotest").output_panel.toggle()<CR>',
+        { noremap = true, silent = true },
+        desc = "output panel",
+      },
     },
 
     config = function()
