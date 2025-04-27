@@ -12,3 +12,13 @@ vim.api.nvim_create_autocmd("BufEnter", {
   end,
   desc = "Disable automatic comment insertion on new lines",
 })
+
+-- Automatically trim trailing whitespace on save
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = "*",
+  callback = function()
+    local pos = vim.api.nvim_win_get_cursor(0)
+    vim.cmd([[%s/\s\+$//e]])
+    vim.api.nvim_win_set_cursor(0, pos)
+  end,
+})
