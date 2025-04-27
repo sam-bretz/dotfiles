@@ -1,6 +1,17 @@
 #Start at home dir (tmux and other complains when initianting from non ~ dirs)
 cd ~
 
+# Vars 
+USER=$(whoami)
+CLOUD_PATH='/Users/$USER/Library/Mobile Documents/com~apple~CloudDocs'
+DOTFILE_PATH='~/.dotfiles'
+
+# Source other aliases
+for file in ~/.dotfiles/zsh/aliases/*.sh(.N); do
+  source "$file"
+done
+
+
 # Add macTex to path
 export PATH="/Library/TeX/texbin:$PATH"
 
@@ -95,26 +106,12 @@ source $ZSH/oh-my-zsh.sh
 alias gs="git status"
 alias k="kubectl"
 alias c="clear"
-alias in="task add project:inbox"
-alias vim="nvim"
-alias v="nvim ."
+alias {vim, v, nv}="nvim ."
 alias zs="source ~/.zshrc"
 
 # Configs
-alias zconf="vim ~/.zshrc"
-alias tconf="vim ~/.tmux.conf"
+alias zconf="nvim ~/.zshrc"
+alias tconf="nvim ~/.tmux.conf"
 
 # Dirs and projects
-alias fairweather="cd ~/projects/fair-weather && v"
-alias nvd='cd ~/.dotfiles/nvim/.config/nvim'
-alias luad='~/.dotfiles/nvim/.config/nvim/lua/sambretz'
-alias dot='cd ~/.dotfiles/ && v'
-alias dotdir='cd ~/.dotfiles/'
-alias nvp='cd ~/.dotfiles/nvim/.config/nvim/ && v' # nvim plugin dir
-alias resume='cd ~/projects/resume && v'
-
-
-
-
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
