@@ -1,50 +1,45 @@
-return {
-  {
-    "theprimeagen/harpoon",
-    keys = {
-      { "<leader>h", desc = "harpoon" },
-      {
-        "<leader>ha",
-        function()
-          require("harpoon.mark").add_file()
-        end,
-        desc = "Harpoon: Add file",
-      },
-      {
-        "<leader>hh",
-        function()
-          require("harpoon.ui").toggle_quick_menu()
-        end,
-        desc = "Harpoon: Toggle menu",
-      },
-      {
-        "<leader>hq",
-        function()
-          require("harpoon.ui").nav_file(1)
-        end,
-        desc = "Harpoon: Nav file 1",
-      },
-      {
-        "<leader>hw",
-        function()
-          require("harpoon.ui").nav_file(2)
-        end,
-        desc = "Harpoon: Nav file 2",
-      },
-      {
-        "<leader>he",
-        function()
-          require("harpoon.ui").nav_file(3)
-        end,
-        desc = "Harpoon: Nav file 3",
-      },
-      {
-        "<leader>hr",
-        function()
-          require("harpoon.ui").nav_file(4)
-        end,
-        desc = "Harpoon: Nav file 4",
-      },
-    },
-  },
-}
+-- Harpoon configuration
+local harpoon = require("harpoon")
+
+-- Initialize harpoon
+harpoon:setup()
+
+-- Keymaps (matching your existing configuration)
+local keymap = vim.keymap.set
+local opts = { noremap = true, silent = true }
+
+-- Add file to harpoon
+keymap("n", "<leader>ha", function()
+  harpoon:list():add()
+end, opts)
+
+-- Toggle harpoon menu
+keymap("n", "<leader>hh", function()
+  harpoon.ui:toggle_quick_menu(harpoon:list())
+end, opts)
+
+-- Navigate to harpooned files
+keymap("n", "<leader>hq", function()
+  harpoon:list():select(1)
+end, opts)
+
+keymap("n", "<leader>hw", function()
+  harpoon:list():select(2)
+end, opts)
+
+keymap("n", "<leader>he", function()
+  harpoon:list():select(3)
+end, opts)
+
+keymap("n", "<leader>hr", function()
+  harpoon:list():select(4)
+end, opts)
+
+-- Toggle previous & next buffers stored within Harpoon list
+keymap("n", "<C-S-P>", function()
+  harpoon:list():prev()
+end, opts)
+
+keymap("n", "<C-S-N>", function()
+  harpoon:list():next()
+end, opts)
