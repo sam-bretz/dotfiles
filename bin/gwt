@@ -1,0 +1,297 @@
+#!/bin/bash
+
+# gwt - git worktree in tmux
+# Interactive git worktree management with fzf and tmux integration
+
+set -e
+
+# Check dependencies
+check_dependencies() {
+    local missing_deps=()
+    
+    if ! command -v fzf &> /dev/null; then
+        missing_deps+=("fzf")
+    fi
+    
+    if ! command -v tmux &> /dev/null; then
+        missing_deps+=("tmux")
+    fi
+    
+    if [ ${#missing_deps[@]} -ne 0 ]; then
+        echo "Error: Missing dependencies: ${missing_deps[*]}"
+        echo "Please install them first:"
+        for dep in "${missing_deps[@]}"; do
+            case $dep in
+                fzf)
+                    echo "  brew install fzf"
+                    ;;
+                tmux)
+                    echo "  brew install tmux"
+                    ;;
+            esac
+        done
+        exit 1
+    fi
+}
+
+# Check if we're in a git repository
+check_git_repo() {
+    if ! git rev-parse --git-dir > /dev/null 2>&1; then
+        echo "Error: Not in a git repository"
+        exit 1
+    fi
+}
+
+# Get the main branch name
+get_main_branch() {
+    git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main"
+}
+
+# List existing worktrees
+list_worktrees() {
+    local main_path=$(git rev-parse --show-toplevel)
+    git worktree list | while read -r path hash branch_info; do
+        if [ "$path" != "$main_path" ]; then
+            echo "$path $branch_info"
+        fi
+    done
+}
+
+# Get branch list for selection
+get_branches() {
+    # Get remote branches excluding HEAD
+    git branch -r | grep -v ' -> ' | sed 's|^ *origin/||' | grep -v "^HEAD"
+}
+
+# Create new worktree
+create_worktree() {
+    local branch="$1"
+    local worktree_dir="$2"
+    
+    echo "Creating worktree for branch '$branch' in '$worktree_dir'"
+    
+    # Check if branch exists locally
+    if git show-ref --verify --quiet "refs/heads/$branch"; then
+        git worktree add "$worktree_dir" "$branch"
+    else
+        # Create new branch tracking remote
+        git worktree add -b "$branch" "$worktree_dir" "origin/$branch"
+    fi
+}
+
+# Start tmux session for worktree
+start_tmux_session() {
+    local worktree_path="$1"
+    local branch="$2"
+    local session_name="gwt-$branch"
+    local window_name="$branch"
+    
+    echo "Switching to worktree:"
+    echo "  Path: $worktree_path"
+    echo "  Branch: $branch"
+    
+    if [ ! -d "$worktree_path" ]; then
+        echo "Error: Worktree directory does not exist: $worktree_path"
+        exit 1
+    fi
+    
+    # Check if we're already inside a tmux session
+    if [ -n "$TMUX" ]; then
+        echo "  Creating new window: $window_name"
+        # Create new window in current session and change directory
+        tmux new-window -n "$window_name" -c "$worktree_path"
+        # Switch to the new window
+        tmux select-window -t "$window_name"
+        # Send command to change directory and show current location
+        tmux send-keys -t "$window_name" "cd '$worktree_path' && pwd && git branch --show-current" Enter
+    else
+        echo "  Session: $session_name"
+        # Kill existing session if it exists
+        tmux kill-session -t "$session_name" 2>/dev/null || true
+        
+        # Create new session in the worktree directory
+        tmux new-session -d -s "$session_name" -c "$worktree_path"
+        
+        # Send initial commands to show location and branch
+        tmux send-keys -t "$session_name" "pwd && git branch --show-current" Enter
+        
+        # Attach to session
+        tmux attach-session -t "$session_name"
+    fi
+}
+
+# Remove worktree
+remove_worktree() {
+    local worktree_info="$1"
+    local worktree_path=$(echo "$worktree_info" | awk '{print $1}')
+    
+    echo "Removing worktree: $worktree_path"
+    git worktree remove "$worktree_path"
+}
+
+# Main menu
+main_menu() {
+    local choice
+    choice=$(echo -e "Create new worktree\nSwitch to existing worktree\nRemove worktree\nList all worktrees" | fzf --prompt="Git Worktree Action: ")
+    
+    case "$choice" in
+        "Create new worktree")
+            create_worktree_menu
+            ;;
+        "Switch to existing worktree")
+            switch_worktree_menu
+            ;;
+        "Remove worktree")
+            remove_worktree_menu
+            ;;
+        "List all worktrees")
+            echo "All worktrees:"
+            git worktree list
+            ;;
+        *)
+            echo "Invalid choice"
+            exit 1
+            ;;
+    esac
+}
+
+# Create worktree menu
+create_worktree_menu() {
+    local branch
+    branch=$(get_branches | fzf --prompt="Select branch: ")
+    
+    if [ -z "$branch" ]; then
+        echo "No branch selected"
+        exit 1
+    fi
+    
+    # Default worktree directory
+    local repo_name=$(basename "$(git rev-parse --show-toplevel)")
+    local worktree_dir="../$repo_name-$branch"
+    
+    read -p "Worktree directory [$worktree_dir]: " custom_dir
+    if [ -n "$custom_dir" ]; then
+        worktree_dir="$custom_dir"
+    fi
+    
+    create_worktree "$branch" "$worktree_dir"
+    start_tmux_session "$worktree_dir" "$branch"
+}
+
+# Switch to existing worktree
+switch_worktree_menu() {
+    local worktrees
+    worktrees=$(list_worktrees)
+    
+    if [ -z "$worktrees" ]; then
+        echo "No additional worktrees found"
+        exit 1
+    fi
+    
+    local selected
+    selected=$(echo "$worktrees" | fzf --prompt="Select worktree: ")
+    
+    if [ -z "$selected" ]; then
+        echo "No worktree selected"
+        exit 1
+    fi
+    
+    local worktree_path=$(echo "$selected" | awk '{print $1}')
+    local branch=$(echo "$selected" | awk '{print $2}' | sed 's/^\[//' | sed 's/\]$//')
+    
+    start_tmux_session "$worktree_path" "$branch"
+}
+
+# Remove worktree menu
+remove_worktree_menu() {
+    local worktrees
+    worktrees=$(list_worktrees)
+    
+    if [ -z "$worktrees" ]; then
+        echo "No additional worktrees to remove"
+        exit 1
+    fi
+    
+    local selected
+    selected=$(echo "$worktrees" | fzf --prompt="Select worktree to remove: ")
+    
+    if [ -z "$selected" ]; then
+        echo "No worktree selected"
+        exit 1
+    fi
+    
+    remove_worktree "$selected"
+}
+
+# Simple switch without fzf dependency
+switch_worktree_simple() {
+    local worktrees
+    worktrees=$(list_worktrees)
+    
+    if [ -z "$worktrees" ]; then
+        echo "No additional worktrees found"
+        exit 1
+    fi
+    
+    echo "Available worktrees:"
+    local i=1
+    local -a paths
+    local -a branches
+    
+    while IFS= read -r line; do
+        local worktree_path=$(echo "$line" | awk '{print $1}')
+        local branch=$(echo "$line" | awk '{print $2}' | sed 's/^\[//' | sed 's/\]$//')
+        echo "$i) $branch ($worktree_path)"
+        paths[$i]="$worktree_path"
+        branches[$i]="$branch"
+        ((i++))
+    done <<< "$worktrees"
+    
+    echo
+    read -p "Select worktree number: " selection
+    
+    if [[ ! "$selection" =~ ^[0-9]+$ ]] || [ "$selection" -lt 1 ] || [ "$selection" -ge "$i" ]; then
+        echo "Invalid selection"
+        exit 1
+    fi
+    
+    start_tmux_session "${paths[$selection]}" "${branches[$selection]}"
+}
+
+# Main execution
+main() {
+    check_dependencies
+    check_git_repo
+    
+    if [ $# -eq 0 ]; then
+        main_menu
+    else
+        case "$1" in
+            -h|--help)
+                echo "gwt - git worktree in tmux"
+                echo ""
+                echo "Usage: gwt [option]"
+                echo ""
+                echo "Options:"
+                echo "  -h, --help    Show this help message"
+                echo "  -l, --list    List all worktrees"
+                echo "  -s, --switch  Switch to a worktree (with selection)"
+                echo ""
+                echo "Without options, opens interactive menu"
+                ;;
+            -l|--list)
+                git worktree list
+                ;;
+            -s|--switch)
+                switch_worktree_simple
+                ;;
+            *)
+                echo "Unknown option: $1"
+                echo "Use 'gwt --help' for usage information"
+                exit 1
+                ;;
+        esac
+    fi
+}
+
+main "$@"
