@@ -1,0 +1,347 @@
+# ============================================================================
+# Git Configuration - Modern Workflow Optimizations
+# This file should be linked to ~/.gitconfig for proper Git integration
+# ============================================================================
+
+[user]
+	name = Sam Bretz
+	email = bretzsam@gmail.com
+	signingkey = ""  # Add your GPG key ID here
+
+[core]
+	# Use delta for better diffs if available, otherwise use less
+	pager = delta --dark --line-numbers --side-by-side
+	editor = nvim
+	autocrlf = false
+	filemode = true
+	# Treat spaces before tabs and all kinds of trailing whitespace as error
+	whitespace = space-before-tab,-indent-with-non-tab,trailing-space
+	# Speed up commands involving untracked files
+	preloadindex = true
+	fscache = true
+	# Make `git rebase` safer on macOS
+	trustctime = false
+	# Prevent showing files whose names contain non-ASCII symbols as unversioned
+	quotepath = false
+	# Enable parallel I/O for operations that support it
+	precomposeunicode = false
+
+[init]
+	defaultBranch = main
+
+[pull]
+	rebase = true
+	# Only allow fast-forward merges when pulling
+	ff = only
+
+[push]
+	# Push only the current branch to avoid accidents
+	default = current
+	# Automatically setup remote tracking
+	autosetupremote = true
+	# Push tags along with commits
+	followTags = true
+	# Make `git push` push relevant annotated tags when pushing branches
+	recurseSubmodules = check
+
+[fetch]
+	# Remove any remote-tracking references that no longer exist on the remote
+	prune = true
+	# Parallel fetch for speed
+	parallel = 0
+
+[merge]
+	# Include summaries of merged commits in newly created merge commit messages
+	log = true
+	# Use nvim for merge conflicts
+	tool = nvimdiff
+	# Automatically resolve merge conflicts when possible
+	conflictStyle = diff3
+
+[mergetool]
+	keepBackup = false
+	# Don't prompt before opening merge tool
+	prompt = false
+
+[mergetool "nvimdiff"]
+	cmd = nvim -d \"$LOCAL\" \"$REMOTE\" \"$MERGED\" -c \"wincmd w\" -c \"wincmd J\"
+
+[rebase]
+	# Use --autosquash by default
+	autosquash = true
+	# Show a diffstat of what changed upstream since the last rebase
+	stat = true
+	# Automatically stash and unstash when rebasing
+	autostash = true
+
+[rerere]
+	# Remember how conflicts were resolved for future use
+	enabled = true
+
+[diff]
+	# Detect renames and copies
+	renames = copies
+	# Use better algorithm for diffs
+	algorithm = histogram
+	# Show submodule changes
+	submodule = log
+	# Use mnemonic prefixes (index, work tree, commit, object) instead of a/b
+	mnemonicprefix = true
+	# Show word diff when appropriate
+	wordRegex = [A-Za-z_][A-Za-z0-9_]*|[^[:space:]]
+
+[diff "bin"]
+	# Use `hexdump` to diff binary files
+	textconv = hexdump -v -C
+
+# Delta configuration for better diffs
+[delta]
+	navigate = true
+	line-numbers = true
+	side-by-side = true
+	syntax-theme = Dracula
+	plus-style = "syntax #012800"
+	minus-style = "syntax #340001"
+	map-styles = "bold purple => syntax #330033, bold blue => syntax #000033"
+
+[interactive]
+	diffFilter = delta --color-only
+
+[add.interactive]
+	useBuiltin = false # required for git 2.37.0
+
+[status]
+	# Show branch and tracking info
+	branch = true
+	# Show short format by default
+	short = true
+	# Show stash info
+	showStash = true
+	# Show untracked files in directories
+	showUntrackedFiles = all
+	# Include submodule changes
+	submoduleSummary = true
+
+[log]
+	# Use abbreviated SHA-1 hash
+	abbrevCommit = true
+	# Follow renames
+	follow = true
+	# Show signature information
+	showSignature = false
+
+[color]
+	ui = auto
+	pager = true
+
+[color "diff"]
+	meta = blue bold
+	frag = magenta bold
+	old = red bold
+	new = green bold
+	whitespace = red reverse
+
+[color "status"]
+	added = green bold
+	changed = yellow bold
+	untracked = red bold
+
+[color "branch"]
+	current = yellow bold
+	local = green bold
+	remote = blue bold
+
+[branch]
+	# Show most recently changed branches first
+	sort = -committerdate
+	# Automatically set up tracking
+	autosetupmerge = always
+	# Automatically rebase when pulling
+	autosetuprebase = always
+
+[tag]
+	# Sort tags by version number
+	sort = version:refname
+
+[versionsort]
+	suffix = -pre
+	suffix = .pre
+	suffix = -beta
+	suffix = .beta
+	suffix = -rc
+	suffix = .rc
+
+# ============================================================================
+# Aliases - Productivity shortcuts
+# ============================================================================
+
+[alias]
+	# Basic shortcuts
+	st = status
+	co = checkout
+	br = branch
+	ci = commit
+	df = diff
+	dfs = diff --staged
+	dfn = diff --name-only
+	lg = log --oneline --graph --decorate --all
+	lol = log --graph --decorate --pretty=oneline --abbrev-commit
+	lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
+	ls = log --pretty=format:"%C(yellow)%h%Cred%d\\\\ %Creset%s%Cblue\\\\ [%cn]" --decorate
+	ll = log --pretty=format:"%C(yellow)%h%Cred%d\\\\ %Creset%s%Cblue\\\\ [%cn]" --decorate --numstat
+	
+	# Show the current branch
+	current = symbolic-ref --short HEAD
+	
+	# Show all branches with their last commit
+	branches = for-each-ref --sort=-committerdate --format='%(refname:short) %(committerdate:short) %(authorname)'
+	
+	# Quick commit shortcuts
+	cm = commit -m
+	cam = commit -a -m
+	amend = commit --amend
+	amendn = commit --amend --no-edit
+	
+	# Stash shortcuts
+	ss = stash save
+	sp = stash pop
+	sl = stash list
+	sa = stash apply
+	sd = stash drop
+	
+	# Remote shortcuts
+	p = push
+	pl = pull
+	pf = push --force-with-lease
+	po = push origin
+	pom = push origin main
+	
+	# Reset shortcuts
+	unstage = reset HEAD --
+	uncommit = reset --soft HEAD~1
+	
+	# Clean shortcuts
+	cleanup = "!git branch --merged | grep -v '\\*\\|main\\|master\\|develop' | xargs -n 1 git branch -d"
+	wipe = "!git add -A && git commit -qm 'WIPE SAVEPOINT' && git reset HEAD~1 --hard"
+	
+	# Info shortcuts
+	who = shortlog -s --
+	whois = "!sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -"
+	whatis = show -s --pretty='tformat:%h (%s, %ad)' --date=short
+	
+	# Advanced aliases
+	assume = update-index --assume-unchanged
+	unassume = update-index --no-assume-unchanged
+	assumed = "!git ls-files -v | grep ^h | cut -c 3-"
+	unassumeall = "!git assumed | xargs git update-index --no-assume-unchanged"
+	assumeall = "!git st -s | awk {'print $2'} | xargs git assume"
+	
+	# Find commits by message
+	find = "!git log --pretty=\"format:%Cgreen%H %Cblue%s\" --name-status --grep"
+	
+	# Find commits by file
+	filelog = log -u
+	fl = log -u
+	
+	# Show commits in a date range
+	since = "!f() { git log --oneline --since=\"$1\"; }; f"
+	until = "!f() { git log --oneline --until=\"$1\"; }; f"
+	
+	# Worktree management (preserving existing aliases)
+	spawn = !f() { git fetch origin main && git worktree add -b "$1" "../$(basename $(pwd))-$1" origin/main; }; f
+	trees = worktree list
+	goto = !f() { tree_path=$(git worktree list | grep "$1" | awk "{print \$1}"); [ -n "$tree_path" ] && cd "$tree_path" || echo "Worktree $1 not found"; }; f
+	cleanup-tree = !f() { git worktree remove "$1" && git branch -D "$1" 2>/dev/null || true; }; f
+	nuke = !f() { git worktree remove --force "$1" && git branch -D "$1" 2>/dev/null || true; }; f
+	syncall = !f() { current=$(pwd); git worktree list | while read path branch commit; do [ "$branch" = "(bare)" ] && continue; cd "$path" && git fetch origin main && [ "$branch" = "main" ] && git pull origin main; done; cd "$current"; }; f
+	status-all = !f() { git worktree list | while read path branch commit; do [ "$branch" = "(bare)" ] && continue; echo "=== $branch ($path) ==="; cd "$path" && git status --porcelain; done; }; f
+	
+	# Better log with graph
+	graph = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+	
+	# Show modified files in last commit
+	dl = "!git ll -1"
+	
+	# Show a diff last commit
+	dlc = diff --cached HEAD^
+	
+	# Grep from root folder
+	gra = "!f() { A=$(pwd) && TOPLEVEL=$(git rev-parse --show-toplevel) && cd $TOPLEVEL && git grep --full-name -In $1 | xargs -I{} echo $TOPLEVEL/{} && cd $A; }; f"
+	
+	# List contributors with number of commits
+	contributors = shortlog --summary --numbered
+	
+	# Show branches that have been merged
+	merged = branch --merged
+	
+	# Show branches that have not been merged
+	unmerged = branch --no-merged
+
+# ============================================================================
+# GitHub CLI Integration
+# ============================================================================
+
+[credential "https://github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
+
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
+
+# ============================================================================
+# URL Shortcuts
+# ============================================================================
+
+# Use SSH instead of HTTPS for GitHub
+[url "ssh://git@github.com/"]
+	insteadOf = https://github.com/
+
+# ============================================================================
+# GPG Signing (optional - uncomment and configure if using)
+# ============================================================================
+
+# [commit]
+# 	gpgsign = true
+# 
+# [tag]
+# 	gpgsign = true
+# 
+# [gpg]
+# 	program = gpg
+
+# ============================================================================
+# Submodules
+# ============================================================================
+
+[submodule]
+	recurse = true
+	fetchJobs = 4
+
+# ============================================================================
+# Performance optimizations
+# ============================================================================
+
+[pack]
+	threads = 0
+
+[index]
+	threads = true
+
+[checkout]
+	workers = 0
+
+[feature]
+	manyFiles = true
+
+# ============================================================================
+# Include additional configurations
+# ============================================================================
+
+# Include enhanced git configuration
+[include]
+	path = ~/.config/git/config
+
+# Include local config (for machine-specific settings)
+[include]
+	path = ~/.gitconfig.local

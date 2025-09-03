@@ -1,0 +1,287 @@
+# Taskfile.yml - Consolidated dotfiles task runner
+# https://taskfile.dev
+version: '3'
+
+vars:
+  DOTFILES_ROOT: '{{.PWD}}'
+  BACKUP_DIR: '{{.DOTFILES_ROOT}}/backup'
+  TIMESTAMP: '{{now | date "20060102_150405"}}'
+
+env:
+  DOTFILES_PATH: '{{.DOTFILES_ROOT}}'
+  HOMEBREW_BUNDLE_FILE: '{{.DOTFILES_ROOT}}/brew/Brewfile'
+
+tasks:
+  # ============================================================================
+  # PRIMARY COMMANDS
+  # ============================================================================
+  
+  default:
+    desc: "Show available tasks"
+    cmds:
+      - task --list
+
+  help:
+    desc: "Show usage guide"
+    cmds:
+      - echo 'Dotfiles Task Runner - Consolidated'
+      - echo ''
+      - echo 'Primary Commands:'
+      - echo '  install     - Complete system setup'
+      - echo '  maintain    - Universal maintenance (recommended)'
+      - echo '  update      - Update all packages and plugins'
+      - echo '  doctor      - System health check'
+      - echo '  backup      - Create backup'
+      - echo '  config      - Edit configurations'
+      - echo ''
+      - echo 'Shortcuts - m=maintain, u=update, d=doctor, b=backup'
+
+  # ============================================================================
+  # UNIVERSAL MAINTENANCE - THE ONE COMMAND TO RULE THEM ALL
+  # ============================================================================
+
+  maintain:
+    desc: "Universal maintenance - does everything needed to keep system healthy"
+    cmds:
+      - echo "🔧 Starting Universal Maintenance..."
+      - echo ""
+      - task: backup
+      - echo ""
+      - task: update
+      - echo ""
+      - task: clean
+      - echo ""
+      - task: doctor
+      - echo ""
+      - task: sync
+      - echo ""
+      - echo "✨ Universal maintenance complete!"
+      - echo "Your system is now fully updated, cleaned, and healthy! 🎉"
+
+  # ============================================================================
+  # CORE OPERATIONS
+  # ============================================================================
+
+  install:
+    desc: "Complete dotfiles installation and setup"
+    cmds:
+      - echo "🚀 Starting complete installation..."
+      - task: backup
+      - echo "📦 Installing Homebrew packages..."
+      - 'cd {{.DOTFILES_ROOT}}/brew && brew bundle install --file=Brewfile'
+      - echo "🛠️ Setting up modern CLI tools..."
+      - '{{.DOTFILES_ROOT}}/setup-modern-cli.sh'
+      - echo "🔗 Creating symlinks..."
+      - 'cd {{.DOTFILES_ROOT}} && stow -v alacritty aerospace nvim tmux zsh git bin 2>/dev/null || true'
+      - task: doctor
+      - echo "✅ Installation complete!"
+
+  update:
+    desc: "Update all packages, plugins, and dependencies"
+    cmds:
+      - echo "🔄 Updating everything..."
+      - echo "  • Homebrew packages..."
+      - brew update
+      - brew upgrade
+      - brew cleanup
+      - echo "  • Neovim plugins..."
+      - nvim --headless "+Lazy! sync" +qa 2>/dev/null || true
+      - echo "  • Tmux plugins..."
+      - 'test -d ~/.tmux/plugins/tpm && ~/.tmux/plugins/tpm/bin/update_plugins all || echo "    TPM not found"'
+      - echo "  • Brewfile sync..."
+      - '{{.DOTFILES_ROOT}}/bin/update-brewfile || true'
+      - echo "✅ All updates complete!"
+
+  doctor:
+    desc: "Comprehensive system health check"
+    cmds:
+      - echo "🏥 System Health Check"
+      - echo ""
+      - |
+        echo "Homebrew:"
+        if command -v brew >/dev/null 2>&1; then
+          echo "  ✓ Installed ($(brew --version | head -1))"
+          outdated=$(brew outdated --formula | wc -l | tr -d ' ')
+          if [ "$outdated" -gt 0 ]; then
+            echo "  ⚠ $outdated packages outdated (run 'task update' to fix)"
+          else
+            echo "  ✓ All packages up to date"
+          fi
+        else
+          echo "  ✗ Homebrew not installed"
+        fi
+      - |
+        echo "Git:"
+        if command -v git >/dev/null 2>&1; then
+          echo "  ✓ Installed ($(git --version | cut -d' ' -f3))"
+          if git config --get user.email >/dev/null; then
+            echo "  ✓ User configured ($(git config --get user.email))"
+          else
+            echo "  ⚠ User not configured"
+          fi
+        else
+          echo "  ✗ Git not installed"
+        fi
+      - |
+        echo "Shell:"
+        echo "  ✓ Current: $SHELL"
+        if [ -d ~/.oh-my-zsh ]; then
+          echo "  ✓ Oh My Zsh installed"
+        else
+          echo "  ⚠ Oh My Zsh not installed"
+        fi
+      - |
+        echo "Editors:"
+        if command -v nvim >/dev/null 2>&1; then
+          echo "  ✓ Neovim ($(nvim --version | head -1 | cut -d' ' -f2))"
+        else
+          echo "  ✗ Neovim not installed"
+        fi
+        if command -v tmux >/dev/null 2>&1; then
+          echo "  ✓ Tmux ($(tmux -V | cut -d' ' -f2))"
+        else
+          echo "  ✗ Tmux not installed"
+        fi
+      - |
+        echo "Modern CLI:"
+        tools=(eza bat zoxide delta lazygit yazi)
+        for tool in "${tools[@]}"; do
+          if command -v "$tool" >/dev/null 2>&1; then
+            echo "  ✓ $tool"
+          else
+            echo "  ⚠ $tool missing"
+          fi
+        done
+      - echo ""
+      - echo "✅ Health check complete!"
+
+  backup:
+    desc: "Create timestamped backup of dotfiles"
+    vars:
+      BACKUP_PATH: '{{.BACKUP_DIR}}/dotfiles_{{.TIMESTAMP}}.tar.gz'
+    cmds:
+      - echo "Creating backup..."
+      - mkdir -p {{.BACKUP_DIR}}
+      - tar -czf {{.BACKUP_PATH}} --exclude=.git --exclude=backup -C {{.DOTFILES_ROOT}} .
+      - echo "Backup created at {{.BACKUP_PATH}}"
+
+  clean:
+    desc: "Clean system caches and temporary files"
+    cmds:
+      - echo "🧹 Cleaning system..."
+      - echo "  • Homebrew caches..."
+      - brew cleanup -s 2>/dev/null || true
+      - brew autoremove 2>/dev/null || true
+      - echo "  • Neovim caches..."
+      - rm -rf ~/.local/share/nvim/swap ~/.local/share/nvim/shada ~/.local/share/nvim/undo 2>/dev/null || true
+      - echo "  • System temporary files..."
+      - rm -rf /tmp/nvim* 2>/dev/null || true
+      - echo "✅ Cleanup complete!"
+
+  sync:
+    desc: "Sync configurations and git repository"
+    dir: '{{.DOTFILES_ROOT}}'
+    cmds:
+      - echo "🔄 Syncing configurations..."
+      - echo "  • Reloading tmux..."
+      - tmux source-file ~/.tmux.conf 2>/dev/null || echo "    Tmux not running"
+      - echo "  • Checking git status..."
+      - git status -s
+      - |
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "  ⚠ Uncommitted changes found"
+          echo "    Use 'git add -A && git commit -m \"message\"' to commit"
+        else
+          echo "  ✓ Git repository clean"
+        fi
+      - echo "✅ Sync complete!"
+
+  config:
+    desc: "Quick access to edit key configurations"
+    cmds:
+      - echo "⚙️ Configuration Quick Access:"
+      - echo "  zshrc      - nvim ~/.dotfiles/zsh/.zshrc"
+      - echo "  nvim       - nvim ~/.dotfiles/nvim/.config/nvim/"
+      - echo "  tmux       - nvim ~/.dotfiles/tmux/.tmux.conf"
+      - echo "  alacritty  - nvim ~/.dotfiles/alacritty/.config/alacritty/alacritty.toml"
+      - echo "  aerospace  - nvim ~/.dotfiles/aerospace/aerospace.toml"
+      - echo "  taskfile   - nvim ~/.dotfiles/Taskfile.yml"
+
+  # ============================================================================
+  # SPECIALIZED OPERATIONS
+  # ============================================================================
+
+  git:
+    desc: "Git operations for dotfiles"
+    dir: '{{.DOTFILES_ROOT}}'
+    cmds:
+      - echo "📊 Dotfiles Git Status"
+      - git status -sb
+      - echo ""
+      - echo "Recent commits:"
+      - git log --oneline -5
+      - echo ""
+      - echo "Use 'git add -A && git commit -m \"message\"' to commit changes"
+
+  brew:
+    desc: "Homebrew operations"
+    cmds:
+      - echo "🍺 Homebrew Operations"
+      - |
+        echo "Installed packages: $(brew list --formula | wc -l | tr -d ' ') formulae, $(brew list --cask | wc -l | tr -d ' ') casks"
+        outdated=$(brew outdated --formula | wc -l | tr -d ' ')
+        if [ "$outdated" -gt 0 ]; then
+          echo "Outdated packages: $outdated"
+          echo "Run 'task update' to upgrade all packages"
+        else
+          echo "All packages up to date ✓"
+        fi
+
+  nvim:
+    desc: "Neovim operations"
+    cmds:
+      - echo "🎨 Neovim Operations"
+      - echo "Syncing plugins..."
+      - nvim --headless "+Lazy! sync" +qa
+      - echo "Running health check..."
+      - nvim "+checkhealth" "+qa" || true
+
+  emergency:
+    desc: "Emergency reset and reinstall (use with caution)"
+    cmds:
+      - echo "🚨 Emergency Reset - This will reset all configurations!"
+      - echo "Creating emergency backup first..."
+      - task: backup
+      - echo "Removing symlinks..."
+      - 'cd {{.DOTFILES_ROOT}} && stow -D alacritty aerospace nvim tmux zsh git bin 2>/dev/null || true'
+      - echo "Reinstalling..."
+      - task: install
+      - echo "🆘 Emergency reset complete!"
+
+  # ============================================================================
+  # QUICK SHORTCUTS
+  # ============================================================================
+
+  m:
+    desc: "Quick maintain (universal maintenance)"
+    cmds: [task: maintain]
+
+  u:
+    desc: "Quick update"
+    cmds: [task: update]
+
+  d:
+    desc: "Quick doctor"
+    cmds: [task: doctor]
+
+  b:
+    desc: "Quick backup"
+    cmds: [task: backup]
+
+  s:
+    desc: "Quick sync"
+    cmds: [task: sync]
+
+  g:
+    desc: "Quick git status"
+    cmds: [task: git]

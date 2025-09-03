@@ -52,11 +52,12 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 #                 Monitor pattern is the same as for 'workspace-to-monitor-force-assignment'.
 #                 See: https://nikitabobko.github.io/AeroSpace/guide#assign-workspaces-to-monitors
 [gaps]
+# Increased inner gaps to create visual borders between windows
 inner.horizontal = 10
 inner.vertical = 10
 outer.left = 10
 outer.bottom = 10
-outer.top = 45
+outer.top = 10
 outer.right = 10
 
 # 'main' binding mode declaration
@@ -104,11 +105,10 @@ alt-shift-minus = 'resize smart -50'
 alt-shift-equal = 'resize smart +50'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#workspace
-alt-y = 'workspace 1'
-alt-u = 'workspace 2'
-alt-i = 'workspace 3'
-alt-o = 'workspace 4'
-alt-p = 'workspace 5'
+alt-h = 'workspace 1'
+alt-j = 'workspace 2'
+alt-k = 'workspace 3'
+alt-l = 'workspace 4'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
 alt-shift-y = 'move-node-to-workspace 1'

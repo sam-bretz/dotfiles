@@ -1,0 +1,96 @@
+# ===============================================
+# DOTFILES GITIGNORE - SECURITY FOCUSED
+# ===============================================
+
+# ===============================================
+# SECRETS & CREDENTIALS (NEVER COMMIT)
+# ===============================================
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+*.p12
+*.pfx
+*password*
+*secret*
+*token*
+id_rsa*
+id_ed25519*
+id_ecdsa*
+
+# ===============================================
+# SYSTEM FILES
+# ===============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
+
+# ===============================================
+# EDITORS & IDEs
+# ===============================================
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# ===============================================
+# BACKUP & TEMPORARY FILES
+# ===============================================
+*.bak
+*.backup
+*.tmp
+*.temp
+.backup/
+.tmp/
+
+# ===============================================
+# LOGS & DEBUG
+# ===============================================
+*.log
+debug.log
+error.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ===============================================
+# NODE.JS
+# ===============================================
+node_modules/
+.npm
+.yarn-integrity
+
+# ===============================================
+# PYTHON
+# ===============================================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+
+# ===============================================
+# CACHED CREDENTIALS
+# ===============================================
+.ssh/known_hosts
+.aws/credentials
+.kube/config
+.docker/config.json
+.netrc
+
+# ===============================================
+# PERSONAL/LOCAL CONFIGS
+# ===============================================
+config.local.*
+*local.conf
+personal/
+private/

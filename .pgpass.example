@@ -1,0 +1,27 @@
+# ===============================================
+# POSTGRESQL PASSWORD FILE TEMPLATE
+# ===============================================
+# Copy this to ~/.pgpass and set your actual password
+# Format: hostname:port:database:username:password
+#
+# Security: This file will have 600 permissions automatically
+# Usage: cp ~/.dotfiles/.pgpass.example ~/.pgpass && chmod 600 ~/.pgpass
+
+# SourceHub Database Connection
+# Replace 'YourActualPassword' with the real password
+sourcehub-db.cfm0kcykeufs.us-east-2.rds.amazonaws.com:5432:sourcehub:sourcehub_admin:YourActualPassword
+
+# Additional database connections (examples)
+# localhost:5432:myapp_dev:developer:dev_password
+# staging-db.example.com:5432:myapp_staging:app_user:staging_password
+# prod-db.example.com:5432:myapp_prod:app_user:prod_password
+
+# ===============================================
+# USAGE INSTRUCTIONS
+# ===============================================
+# 1. Copy this file: cp ~/.dotfiles/.pgpass.example ~/.pgpass
+# 2. Edit with real password: nvim ~/.pgpass
+# 3. Set permissions: chmod 600 ~/.pgpass
+# 4. Test connection: psql -h sourcehub-db.cfm0kcykeufs.us-east-2.rds.amazonaws.com -U sourcehub_admin -d sourcehub
+#
+# After setup, the sourcehub-db alias will automatically use this password file
